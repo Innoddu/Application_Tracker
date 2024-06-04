@@ -2,13 +2,12 @@ from datetime import datetime
 import imaplib,csv, email, re, os, time, schedule
 from email.header import decode_header
 from dotenv import load_dotenv
-from bs4 import BeautifulSoup
 
 # load .env
 load_dotenv()
 
 # Create CSV file
-f = open('application_tracker.csv', 'w', newline='')
+f = open('Linkedin_applications.csv', 'w', newline='')
 write = csv.writer(f)
 write.writerow(['#', 'Date', 'Company', 'Status'])
 
@@ -46,7 +45,7 @@ def check_emails():
         mail.select("inbox")
 
         # Search date
-        start_date = datetime(2024, 5, 1).strftime('%d-%b-%Y')
+        start_date = datetime(2024, 3, 1).strftime('%d-%b-%Y')
         end_date = datetime.now().strftime('%d-%b-%Y')
 
         # Search Email
@@ -66,7 +65,7 @@ def check_emails():
         # email_ids = list(set(email_ids_1).union(set(email_ids_2)))
         email_ids = messages[0].split()
 
-        for email_id in email_ids[-10:]:
+        for email_id in email_ids[:]:
             # Get email data
             status, msg_data = mail.fetch(email_id, "(RFC822)")
             msg = email.message_from_bytes(msg_data[0][1])
@@ -119,6 +118,7 @@ def check_emails():
                         print(f'Date: {formatted_date}')
                         print(f'index: {index}')
                         print(f'Status: {application_status}')
+                        print(f'match: {match}')
                         print("="*100)
 
   

@@ -1,3 +1,13 @@
+# Root
 .env
 credentials.json
-application_tracker.csv
+token.pickle
+
+# Linkedin Emails
+/LinkedinEmail/application_tracker.csv
+/LinkedinEmail/Linkedin_applications.csv
+
+# Other Emails
+/OtherEmail/auth.py
+/OtherEmail/credentials.json
+/OtherEmail/token.pickle
