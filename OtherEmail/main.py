@@ -1,66 +1,61 @@
-import imaplib, os, email, json, pickle
+import email, csv
 from email.header import decode_header
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 from datetime import datetime
 from auth import USERNAME, creds, oauth2_login
 
-# Connect to the IMAP server
-mail = oauth2_login(USERNAME, creds)
-mail.select("inbox")
 
-# Search for all emails
-status, messages = mail.search(None, "ALL")
-email_ids = messages[0].split()
+f = open('email.csv', 'w', newline='')
+write = csv.writer(f)
+write.writerow(['#', 'Date', 'from', 'title', 'body'])
 
-# Process the first 10 emails
-for email_id in email_ids[:10]:
-    # Fetch the email data
-    status, msg_data = mail.fetch(email_id, "(RFC822)")
-    msg = email.message_from_bytes(msg_data[0][1])
+def check_emails():
 
-    # Decode the email subject
-    subject, encoding = decode_header(msg["Subject"])[0]
-    if isinstance(subject, bytes):
-        subject = subject.decode(encoding if encoding else "utf-8")
-
-    # Decode and format the email date
-    date_str, encoding = decode_header(msg["Date"])[0]
-    if isinstance(date_str, bytes):
-        date_str = date_str.decode(encoding if encoding else "utf-8")
-    
-    # Remove unnecessary parts such as " (UTC)"
-    date_str = date_str.split(' (')[0]
-
-    # Parse and format the date
     try:
-        temp = datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %z')
-        formatted_date = temp.strftime('%Y-%m-%d %H:%M:%S')
-    except ValueError as e:
-        print(f"Error parsing date: {date_str} -> {e}")
-        formatted_date = "Unknown"
+        # Connect to the IMAP server
+        mail = oauth2_login(USERNAME, creds)
+        mail.select("inbox")
 
-    # Get the email sender
-    from_ = msg.get("From")
+        start_date = datetime(2024, 6, 1).strftime('%d-%b-%Y')
+        end_date = datetime.now().strftime('%d-%b-%Y')
 
-    # Extract the email body
-    body = None
-    content_type = msg.get_content_type()
-    if content_type == "text/plain":
-        try:
-            body = msg.get_payload(decode=True).decode()
-        except Exception as e:
-            print(f"Error decoding body: {e}")
-            body = "Error decoding body"
+        # Search for all emails
+        status, messages = mail.search(None, f'SINCE {start_date} BEFORE {end_date}')
+        email_ids = messages[0].split()
 
-        print(f"Body: {body}")
-        print("="*100)
+        # Process the first 10 emails
+        for i, email_id in enumerate(email_ids):
+            status, msg_data = mail.fetch(email_id, '(RFC822)')
+            for response_part in msg_data:
+                if isinstance(response_part, tuple):
+                    msg = email.message_from_bytes(response_part[1])
+                    date = msg['date']
+                    sender = msg['from']
+                    subject = msg['subject']
+                    body = ""
+                    if msg.is_multipart():
+                        for part in msg.walk():
+                            content_type = part.get_content_type()
+                            content_disposition = str(part.get("Content-Disposition"))
+                            if "attachment" in content_disposition:
+                                attachment = "Yes"
+                            else:
+                                attachment = "No"
+                            if content_type == "text/plain" and "attachment" not in content_disposition:
+                                body += part.get_payload(decode=True).decode()
+                    else:
+                        body = msg.get_payload(decode=True).decode()
+                        attachment = "No"
+                    
+                    recipient = msg['to']
+                    domain = sender.split('@')[-1]
+                    keywords = any(keyword in body.lower() for keyword in ["application", "resume", "cv", "job", "position", "apply"])
+                    length = len(body)
 
-    # Print the email details
-    print(f"Subject: {subject}")
-    print(f"Date: {formatted_date}")
-    print(f"From: {from_}")
+                    write.writerow([i+1, date, sender, subject, body, attachment, recipient, domain, keywords, length])
 
-# Logout from the IMAP server
-mail.logout()
+        # 이메일 연결 종료
+        mail.logout()
+        f.close()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+

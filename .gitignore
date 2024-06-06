@@ -11,3 +11,5 @@ token.pickle
 /OtherEmail/auth.py
 /OtherEmail/credentials.json
 /OtherEmail/token.pickle
+/OtherEmail/berkeleyEmail.csv
+

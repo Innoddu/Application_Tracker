@@ -12,7 +12,6 @@ write = csv.writer(f)
 write.writerow(['#', 'Date', 'Company', 'Status'])
 
 
-
 # User information
 username = os.getenv("EMAIL")
 password = os.getenv("PASSWORD")
@@ -26,10 +25,8 @@ pattern = r'\bto\b\s(.+?)(?:\.\s|$)'
 
 
 # Negative Kewords
-keywords = ["Unfortunately", "unfortunately", "not be moving forward"]
-keyword_found = {keyword: False for keyword in keywords}
-
-# Index
+# keywords = ["Unfortunately", "unfortunately", "not be moving forward"]
+# keyword_found = {keyword: False for keyword in keywords}
 
 
 def check_emails():
@@ -40,22 +37,21 @@ def check_emails():
 
     try:
         # Connect to IMAP
+       
         mail = imaplib.IMAP4_SSL(IMAP_SERVER)
         mail.login(username, password)
         mail.select("inbox")
-
         # Search date
-        start_date = datetime(2024, 3, 1).strftime('%d-%b-%Y')
+        start_date = datetime(2024, 1, 1).strftime('%d-%b-%Y')
         end_date = datetime.now().strftime('%d-%b-%Y')
 
         # Search Email
         # status, messages_1 = mail.search(None, '(HEADER Subject "Your application to")')
         # status, messages_2 = mail.search(None, '(HEADER Subject "your application was sent to")')
         # status, messages = mail.search(None, '(OR (HEADER Subject "Your application to") (HEADER Subject "your application was sent to"))')
-        # 추가 조건 설정
-        additional_condition = '(OR (HEADER Subject "Your application to") (HEADER Subject "your application was sent to"))'
 
-        # 날짜 범위와 추가 조건으로 이메일 검색
+        additional_condition = '(OR (HEADER Subject "Your application to") (HEADER Subject "your application was sent to"))'
+        # Apply condition to search email
         status, messages = mail.search(None, f'(SINCE "{start_date}" BEFORE "{end_date}" {additional_condition})')
 
 
@@ -64,7 +60,6 @@ def check_emails():
         # email_ids_2 = messages_2[0].split()
         # email_ids = list(set(email_ids_1).union(set(email_ids_2)))
         email_ids = messages[0].split()
-
         for email_id in email_ids[:]:
             # Get email data
             status, msg_data = mail.fetch(email_id, "(RFC822)")
@@ -118,7 +113,6 @@ def check_emails():
                         print(f'Date: {formatted_date}')
                         print(f'index: {index}')
                         print(f'Status: {application_status}')
-                        print(f'match: {match}')
                         print("="*100)
 
   
