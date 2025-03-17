@@ -8,15 +8,17 @@ token.pickle
 /LinkedinEmail/Linkedin_applications.csv
 
 # Other Emails
-/OtherEmail/auth.py
-/OtherEmail/credentials.json
-/OtherEmail/token.pickle
-/OtherEmail/berkeleyEmail.csv
-/OtherEmail/testCompanyName.csv
-/OtherEmail/email.csv
-/OtherEmail/testEmail.csv
-/OtherEmail/data_engineering.ipynb
-/OtherEmail/logistic_regression_model.pkl
-/OtherEmail/train.py
-/OtherEmail/.ipynb_checkpoints
-/OtherEmail/__pycache__
+/application_tracker/auth.py
+/application_tracker/credentials.json
+/application_tracker/token.pickle
+/application_tracker/berkeleyEmail.csv
+/application_tracker/testCompanyName.csv
+/application_tracker/email.csv
+/application_tracker/testEmail.csv
+/application_tracker/data_engineering.ipynb
+/application_tracker/logistic_regression_model.pkl
+/application_tracker/train.py
+/application_tracker/.ipynb_checkpoints
+/application_tracker/__pycache__
+/application_tracker/package-lock.json
+/application_tracker/package.json
