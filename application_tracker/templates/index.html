@@ -1,0 +1,249 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Email Categorization Results</title>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+          const today = new Date().toISOString().split('T')[0];
+          document.getElementById("start_date").setAttribute('max', today);
+          document.getElementById("end_date").setAttribute('max', today);
+        });
+      </script>
+    <style>
+        @font-face {
+            font-family: 'Cafe24Ohsquare';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/Cafe24Ohsquare.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body { 
+            
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #61738d; 
+            color: rgb(0, 0, 0);
+        }
+        h1 {
+            font-family: 'Cafe24Ohsquare';
+            margin-top: 50px;
+            margin-bottom: 50px;
+            text-align: center;
+            color: #071c28;
+            letter-spacing: 5px;
+        }
+        /* 날짜 입력 폼 스타일 */
+        #date-form {
+            font-family: 'Cafe24Ohsquare';
+            text-align: center;
+            margin-bottom: 50px;
+            margin-top: 30px;
+        }
+        #date-form label {
+            font-family: 'Cafe24Ohsquare';
+            margin: 0 10px;
+            font-size: 18px;
+            color: rgb(33, 28, 54);
+        }
+        #date-form input {
+            padding: 5px;
+            font-size: 16px;
+        }
+        .section-title {
+            margin-top: 40px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 24px;
+        }
+        .apply-title { background-color: #27ae60; }
+        .reject-title { background-color: #c0392b; }
+        .other-title { background-color: #2980b9; }
+        
+        .results-container {
+            margin: 20px auto;
+            max-width: 1000px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            border-collapse: collapse; 
+            width: 100%; 
+            margin-bottom: 20px;
+            table-layout: fixed;
+            text-align: center;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            overflow-wrap: break-word; 
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+        th { 
+            background-color: #f2f2f2; 
+            font-weight: bold;
+        }
+        .apply { color: #27ae60; font-weight: bold; }
+        .reject { color: #c0392b; font-weight: bold; }
+        .other { color: #2980b9; font-weight: bold; }
+        #spinner {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #start-button {
+            display: block;
+            margin: 60px auto;
+            text-align: center;
+            padding: 20px 40px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #467fa4;
+            color: #fff;
+            border: none;
+            width: 200px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            letter-spacing: 15px;
+        }
+        #start-button:hover {
+            background-color: #2980b9;
+        }
+        #small-talk {
+            font-family: 'Cafe24Ohsquare';
+            margin-top: 20px;
+            font-style: italic;
+            color: rgb(36, 38, 39);
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Application Categorization</h1>
+    <form id="date-form">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" required>
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" required>
+        <button type="submit" id="start-button">START</button>
+    </form>
+    <div id="spinner">
+        <div class="spinner"></div>
+        <p id="small-talk"></p>
+    </div>
+    <div id="results" class="results-container"></div>
+    
+    <script>
+        // 스몰 토크 메시지 배열
+        const smallTalkMessages = [
+            "What did you have for lunch today?",
+            "Have you read any good books lately?",
+            "Remember, every day is a new opportunity.",
+            "How's your day going so far?",
+            "Don't forget to take breaks!",
+            "Sometimes the best ideas come during a pause.",
+            "Keep up the great work!"
+        ];
+        
+        let smallTalkInterval;
+        
+        function startSmallTalk() {
+            const smallTalkElem = document.getElementById('small-talk');
+            smallTalkInterval = setInterval(() => {
+                // 배열에서 랜덤 메시지 선택
+                const msg = smallTalkMessages[Math.floor(Math.random() * smallTalkMessages.length)];
+                smallTalkElem.textContent = msg;
+            }, 4000); // 4초마다 변경
+        }
+        
+        function stopSmallTalk() {
+            clearInterval(smallTalkInterval);
+            document.getElementById('small-talk').textContent = "";
+        }
+        
+        document.getElementById('start-button').addEventListener('click', function(e) {
+            e.preventDefault(); // 폼 제출 기본 동작 막기
+
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            // 버튼 숨기기, 스피너 보이기, 스몰 토크 시작
+            document.getElementById('start-button').style.display = 'none';
+            document.getElementById('spinner').style.display = 'block';
+            startSmallTalk();
+            
+            fetch(`/start?start_date=${startDate}&end_date=${endDate}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 스피너와 스몰 토크 중지
+                    document.getElementById('spinner').style.display = 'none';
+                    stopSmallTalk();
+                    
+                    // 카테고리별 결과 테이블 생성
+                    let applyTable = '<table class="results-table">';
+                    applyTable += '<thead><tr><th>ID</th><th>Date</th><th>From</th><th>Company</th><th>Subject</th><th>Category</th></tr></thead><tbody>';
+                    let rejectTable = '<table class="results-table">';
+                    rejectTable += '<thead><tr><th>ID</th><th>Date</th><th>From</th><th>Company</th><th>Subject</th><th>Category</th></tr></thead><tbody>';
+                    let otherTable = '<table class="results-table">';
+                    otherTable += '<thead><tr><th>ID</th><th>Date</th><th>From</th><th>Company</th><th>Subject</th><th>Category</th></tr></thead><tbody>';
+                    
+                    data.forEach(function(email) {
+                        let row = '<tr>';
+                        row += '<td>' + email.id + '</td>';
+                        row += '<td>' + email.date + '</td>';
+                        row += '<td>' + email.from + '</td>';
+                        row += '<td>' + (email.company.join(", ") || "N/A") + '</td>';
+                        row += '<td>' + email.subject + '</td>';
+                        row += '<td class="' + email.category + '">' + email.category + '</td>';
+                        row += '</tr>';
+                        
+                        if (email.category === 'apply') {
+                            applyTable += row;
+                        } else if (email.category === 'reject') {
+                            rejectTable += row;
+                        } else {
+                            otherTable += row;
+                        }
+                    });
+                    
+                    applyTable += '</tbody></table>';
+                    rejectTable += '</tbody></table>';
+                    otherTable += '</tbody></table>';
+                    
+                    let finalHtml = '<h2 class="section-title apply-title">Apply</h2>' + applyTable;
+                    finalHtml += '<h2 class="section-title reject-title">Reject</h2>' + rejectTable;
+                    finalHtml += '<h2 class="section-title other-title">Other</h2>' + otherTable;
+                    
+                    document.getElementById('results').innerHTML = finalHtml;
+                    
+                    // 분류 완료 후, 시작 버튼을 다시 보이게 함
+                    document.getElementById('start-button').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('spinner').innerHTML = '<p>Error occurred during classification.</p>';
+                    stopSmallTalk();
+                    // 에러 발생 시에도 시작 버튼 재노출
+                    document.getElementById('start-button').style.display = 'block';
+                });
+        });
+    </script>
+</body>
+</html>

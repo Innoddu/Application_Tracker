@@ -12,4 +12,11 @@ token.pickle
 /OtherEmail/credentials.json
 /OtherEmail/token.pickle
 /OtherEmail/berkeleyEmail.csv
-
+/OtherEmail/testCompanyName.csv
+/OtherEmail/email.csv
+/OtherEmail/testEmail.csv
+/OtherEmail/data_engineering.ipynb
+/OtherEmail/logistic_regression_model.pkl
+/OtherEmail/train.py
+/OtherEmail/.ipynb_checkpoints
+/OtherEmail/__pycache__
